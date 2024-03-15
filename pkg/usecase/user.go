@@ -3,6 +3,7 @@ package usecase
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"user/service/pkg/domain"
 	"user/service/pkg/helper"
 	interfaces "user/service/pkg/repository/interface"
@@ -40,6 +41,14 @@ func (ur *userUseCase) UsersSignUp(user models.UserSignUp) (domain.TokenUser, er
 	}
 	if phone != nil {
 		return domain.TokenUser{}, errors.New("user with this phone is already exists")
+	}
+	if len(user.Password) < 6 {
+		return domain.TokenUser{}, errors.New("password must be 6 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
+	}
+
+	// Validate email
+	if !strings.HasSuffix(strings.ToLower(user.Email), "@gmail.com") && !strings.HasSuffix(strings.ToLower(user.Email), "@sha.com") {
+		return domain.TokenUser{}, errors.New("email must end with @gmail.com or @sha.com")
 	}
 
 	hashPassword, err := helper.PasswordHash(user.Password)
